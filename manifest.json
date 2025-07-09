@@ -1,0 +1,18 @@
+{
+    "manifest_version": 3,
+    "name": "YouTube Learning Overlay",
+    "version": "1.0",
+    "description": "Summarizes YouTube videos and generates quizzes live.",
+    "permissions": ["activeTab", "scripting"],
+    "content_scripts": [
+      {
+        "matches": ["*://*.youtube.com/*"],
+        "js": ["content.js"]
+      }
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon.png"
+    }
+  }
+  
