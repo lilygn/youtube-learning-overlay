@@ -1,0 +1,128 @@
+/* General overlay container styling */
+#root {
+  max-width: 350px;
+  padding: 1rem;
+  text-align: left;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #fff; /* White text for visibility */
+}
+
+/* Overlay container background styling */
+.youtube-learning-overlay-root {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  max-height: 500px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  padding: 20px;
+  z-index: 999999;
+  cursor: move;
+}
+
+/* Header styling */
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 0.75rem;
+  color: #00b4d8; /* Bright cyan accent */
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #90e0ef; /* Light cyan */
+  border-bottom: 1px solid #00b4d8;
+  padding-bottom: 3px;
+}
+
+/* Bullet point list styling */
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li {
+  margin-bottom: 8px;
+  line-height: 1.4;
+  background: rgba(255, 255, 255, 0.1); /* Transparent white highlight */
+  border-radius: 5px;
+  padding: 6px 10px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  color: #fff; /* Ensure text is visible */
+
+  cursor: pointer;
+}
+
+li:hover {
+  transform: scale(1.03);
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Quiz question styling */
+.quiz-question {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1); /* Transparent white highlight */
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.quiz-question strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #caf0f8; /* Lighter cyan */
+}
+
+.quiz-answer {
+  font-style: italic;
+  color: #90e0ef; /* Light cyan for answers */
+  margin-top: 5px;
+}
+
+/* Button styling */
+button {
+  background-color: rgba(0, 180, 216, 0.8);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  text-align: center;
+  font-size: 0.9rem;
+  margin: 4px 2px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: rgba(0, 180, 216, 1);
+}
+
+/* Close button styling (if needed) */
+.close-button {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #fff;
+}
+.summary-list li {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding: 6px 10px;
+  margin-bottom: 5px;
+  color: #fff;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.summary-list li:hover {
+  transform: scale(1.03);
+  background-color: rgba(255, 255, 255, 0.2);
+}
