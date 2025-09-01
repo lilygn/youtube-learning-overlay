@@ -1,4 +1,5 @@
-OPEN_AI_KEY="PUT YOUR OPENAI KEY HERE"
+import fetch from 'node-fetch';
+const OPEN_AI_KEY = process.env.OPEN_AI_KEY;
 
 export async function summarizeText(text) {
   const prompt = `Summarize the following YouTube video transcript into clear, concise bullet points of only the most important concepts, facts, or ideas. Format each point with a dash (-) at the start:\n\n${text}\n\nSummary:`;

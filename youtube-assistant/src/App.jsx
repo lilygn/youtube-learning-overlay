@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { getTranscript } from './transcript.jsx'
 import { summarizeText, generateQuizQuestions } from './openai.jsx';
+//import ChatBot from './ChatBot.jsx';
 
 function App() {
   const [summary, setSummary] = useState("Loading summary...");
   const [quiz, setQuiz] = useState([]); 
+  const [chatOpen, setChatOpen] = useState(false);
+  const [userInput, setUserInput] = useState("");
 
   useEffect(() => {
     async function pipeline() {
@@ -23,36 +26,51 @@ function App() {
     }
     pipeline();
   }, []);
+
   
   return (
-    <div style={{ color: 'black', fontFamily: 'sans-serif' }}>
-      <h1>YouTube Learning Assistant</h1>
+    <>
+    <div className="main-overlay-content">
 
-      <h2>Summary</h2>
-      <ul className="summary-list">
-        {summary.split(" - ").map((point, index) => (
-          <li key={index}>{point.trim()}</li>
+<h1>YouTube Learning Assistant</h1>
+
+<h2>Summary</h2>
+<ul className="summary-list">
+{summary
+.split("\n")
+.filter(line => line.trim().startsWith("-")) 
+.map((point, index) => (
+<li key={index}>
+  {point.replace(/^-\s*/, '')}
+</li>
+))}
+</ul>
+
+<h2>Quiz Questions</h2>
+{quiz.length > 0 ? (
+  quiz.map((q, index) => (
+    <div key={index} className="quiz-question">
+      <strong>{index + 1}. {q.question}</strong>
+      <ul>
+        {q.choices.map((choice, i) => (
+          <li key={i}>{choice}</li>
         ))}
       </ul>
-
-      <h2>Quiz Questions</h2>
-      {quiz.length > 0 ? (
-        quiz.map((q, index) => (
-          <div key={index} className="quiz-question">
-            <strong>{index + 1}. {q.question}</strong>
-            <ul>
-              {q.choices.map((choice, i) => (
-                <li key={i}>{choice}</li>
-              ))}
-            </ul>
-            <div className="quiz-answer">Correct Answer: {q.answer}</div>
-          </div>
-        ))
-      ) : (
-        <p>No quiz available.</p>
-      )}
+      <div className="quiz-answer">Correct Answer: {q.answer}</div>
     </div>
+  ))
+) : (
+  <p>No quiz available.</p>
+)}
+
+</div>
+
+    </>
+    
+    
   );
+  
+  
 }
 
 export default App

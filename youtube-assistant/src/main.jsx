@@ -8,10 +8,16 @@ console.log("React overlay script running!");
 const overlayDiv = document.createElement('div');
 overlayDiv.id = 'youtube-learning-overlay-root';
 overlayDiv.className = 'youtube-learning-overlay-root';
+overlayDiv.style.pointerEvents = 'auto'; // Allow interactions
+
 document.body.appendChild(overlayDiv);
 
 // Make overlay draggable
 overlayDiv.onmousedown = function(event) {
+  const tag = event.target.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON' || event.target.isContentEditable) {
+    return;
+  }
   event.preventDefault();
 
   let shiftX = event.clientX - overlayDiv.getBoundingClientRect().left;
