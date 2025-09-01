@@ -1,19 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  optimizeDeps: {
-    include: ['react', 'react-dom']
-  },
   build: {
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
-      external: [], 
+      input: {
+        content: resolve(__dirname, 'src/main.jsx'),
+      },
       output: {
-        entryFileNames: 'assets/content.js',
-        chunkFileNames: 'assets/[name].js',
-        assetFileNames: 'assets/[name].[ext]',
-      }
-    }
-  }
+        entryFileNames: (chunk) =>
+          chunk.name === 'content' ? 'content.js' : '[name].js',
+        assetFileNames: 'assets/[name][extname]',
+      },
+    },
+  },
 });

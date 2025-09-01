@@ -3,45 +3,58 @@
   padding: 1rem;
   text-align: left;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #fff; 
+  color: #fff;
 }
+
 .main-overlay-content {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #fff;
 }
 
+/* inner overlay (inside shadow) */
 .youtube-learning-overlay-root {
   all: initial;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+
+  /* 🔑 stays tied to fixed-position host div */
+  position: relative;
+  inset: auto;
+  bottom: auto;
+  right: auto;
+
   width: 350px;
   max-height: 500px;
-  overflow-y: auto;
+
+  /* 🔑 flex layout: fixed header + scrollable body */
+  display: flex;
+  flex-direction: column;
+
+  /* 🔑 clip inner scroll; body will handle overflow */
+  overflow: hidden;
+
   background: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
   backdrop-filter: blur(10px);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   padding: 20px;
-  z-index: 2147483647; 
-  cursor: move;
+  z-index: 2147483647;
+
+  cursor: default; /* drag cursor is applied on header */
   pointer-events: auto;
 }
-
 
 h1 {
   font-size: 1.8rem;
   margin-bottom: 0.75rem;
-  color: #00b4d8; 
+  color: #00b4d8;
 }
 
 h2 {
   font-size: 1.3rem;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-  color: #90e0ef; 
+  color: #90e0ef;
   border-bottom: 1px solid #00b4d8;
   padding-bottom: 3px;
 }
@@ -54,12 +67,11 @@ ul {
 li {
   margin-bottom: 8px;
   line-height: 1.4;
-  background: rgba(255, 255, 255, 0.1); 
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
   padding: 6px 10px;
   transition: transform 0.2s ease, background-color 0.2s ease;
-  color: #fff; 
-
+  color: #fff;
   cursor: pointer;
 }
 
@@ -71,20 +83,20 @@ li:hover {
 .quiz-question {
   margin-bottom: 15px;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.1); 
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .quiz-question strong {
   display: block;
   margin-bottom: 5px;
-  color: #caf0f8; 
+  color: #caf0f8;
 }
 
 .quiz-answer {
   font-style: italic;
-  color: #90e0ef; 
+  color: #90e0ef;
   margin-top: 5px;
 }
 
@@ -115,6 +127,7 @@ button:hover {
   cursor: pointer;
   color: #fff;
 }
+
 .summary-list li {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
@@ -127,4 +140,36 @@ button:hover {
 .summary-list li:hover {
   transform: scale(1.03);
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* draggable header styling (drag handle) */
+.yt-overlay__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  /* keep header visible; it won't scroll */
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+
+  cursor: grab;
+  user-select: none;
+}
+
+.yt-overlay__header:active {
+  cursor: grabbing;
+}
+
+/* 🔑 make the BODY the scroll container */
+.main-overlay-content {
+  /* take remaining space in the flex column */
+  flex: 1 1 auto;
+
+  /* critical for scroll inside flex children */
+  min-height: 0;
+
+  /* actual scrolling happens here */
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
