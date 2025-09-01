@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 
 const HOST_ID = 'youtube-learning-overlay-host';
-const CSS_URL = chrome.runtime.getURL('assets/index.css');
+const CSS_URL = chrome.runtime.getURL('App.css'); // because it's in public/App.css → dist/App.css
 
 function ensureHost() {
   let host = document.getElementById(HOST_ID);
@@ -15,18 +15,37 @@ function ensureHost() {
   host.style.position = 'fixed';
   host.style.zIndex = '2147483647';
   host.style.bottom = '20px';
-  host.style.right  = '20px';
+  host.style.right = '20px';
   host.style.pointerEvents = 'auto';
   (document.body || document.documentElement).appendChild(host);
   return host;
 }
 
-function injectStyles(shadow) {
-  if (shadow.querySelector('link[data-ylo-style]')) return;
+async function injectStyles(shadow) {
+  if (shadow.querySelector('link[data-ylo-style], style[data-ylo-inline]')) return;
+
   const link = document.createElement('link');
-  link.dataset.yloStyle = 'true';
   link.rel = 'stylesheet';
-  link.href = CSS_URL; // require web_accessible_resources
+  link.dataset.yloStyle = 'true';
+  link.href = CSS_URL;
+
+  link.onload = () => console.log('[YLO] CSS linked OK:', link.href);
+  link.onerror = async () => {
+    console.warn('[YLO] CSS link failed, inlining instead:', link.href);
+    try {
+      const res = await fetch(CSS_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const css = await res.text();
+      const style = document.createElement('style');
+      style.dataset.yloInline = 'true';
+      style.textContent = css;
+      shadow.appendChild(style);
+      console.log('[YLO] CSS inlined OK');
+    } catch (err) {
+      console.error('[YLO] CSS inline fetch failed:', err);
+    }
+  };
+
   shadow.appendChild(link);
 }
 
@@ -35,7 +54,7 @@ function makeDraggable(host, shadow, handleSel = '#ytDragHandle') {
   if (!handle || handle._yloDragBound) return;
   handle._yloDragBound = true;
 
-  let dragging = false, startX=0, startY=0, startLeft=0, startTop=0;
+  let dragging = false, startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
   const onDown = (e) => {
     const t = e.target;
@@ -48,7 +67,6 @@ function makeDraggable(host, shadow, handleSel = '#ytDragHandle') {
     startLeft = r.left; startTop = r.top;
     startX = e.clientX; startY = e.clientY;
 
-    // switch to top/left so movement works from any starting corner
     host.style.right = 'auto';
     host.style.bottom = 'auto';
     host.style.left = `${startLeft}px`;
@@ -67,7 +85,6 @@ function makeDraggable(host, shadow, handleSel = '#ytDragHandle') {
     try { handle.releasePointerCapture?.(e.pointerId); } catch {}
   };
 
-  // prevent touch scrolling from stealing the gesture
   handle.style.touchAction = 'none';
   handle.style.userSelect = 'none';
   handle.addEventListener('pointerdown', onDown, { passive: false });
@@ -79,7 +96,7 @@ function mountApp() {
   const host = ensureHost();
   const shadow = host.shadowRoot || host.attachShadow({ mode: 'open' });
 
-  injectStyles(shadow);
+  injectStyles(shadow); // inject App.css into shadow
 
   let rootEl = shadow.getElementById?.('ylo-root');
   if (!rootEl) {
@@ -91,22 +108,18 @@ function mountApp() {
   if (!rootEl._yloRoot) rootEl._yloRoot = createRoot(rootEl);
   rootEl._yloRoot.render(<App />);
 
-  // (re)bind drag after the App renders (in case the handle appears later)
   makeDraggable(host, shadow, '#ytDragHandle');
   setTimeout(() => makeDraggable(host, shadow, '#ytDragHandle'), 0);
 }
 
 function startWatchdogs() {
-  // remount on YouTube SPA navigations
   window.addEventListener('yt-navigate-finish', () => setTimeout(mountApp, 50));
 
-  // remount if our host is removed
   const mo = new MutationObserver(() => {
     if (!document.getElementById(HOST_ID)) mountApp();
   });
   mo.observe(document.documentElement, { childList: true, subtree: true });
 
-  // periodic safety check (covers rare wipes)
   setInterval(() => {
     if (!document.getElementById(HOST_ID)) mountApp();
   }, 3000);

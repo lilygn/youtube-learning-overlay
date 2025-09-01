@@ -1,40 +1,32 @@
 async function getKey() {
   return new Promise((resolve, reject) => {
     chrome.storage.sync.get('OPENAI_KEY', ({ OPENAI_KEY }) => {
-      if (!OPENAI_KEY) {
-        reject(new Error('No API key set. Go to extension settings.'));
-      } else {
-        resolve(OPENAI_KEY);
-      }
+      if (!OPENAI_KEY) return reject(new Error('No API key set. Go to extension settings.'));
+      resolve(OPENAI_KEY);
     });
   });
 }
 
-export async function summarizeText(text) {
-  const OPEN_AI_KEY = await getKey();   // <-- get the user’s key here
-  const prompt = `Summarize the following transcript into bullet points:\n\n${text}`;
+export async function generateQuizQuestions(text) {
+  const OPEN_AI_KEY = await getKey();
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPEN_AI_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
+  const prompt = `
+Create exactly 3 multiple-choice questions from this transcript.
+Return ONLY JSON with this shape (no backticks, no prose):
 
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || '';
+{
+  "questions": [
+    { "question": "...", "choices": ["A","B","C","D"], "answer": "A" },
+    { "question": "...", "choices": ["A","B","C","D"], "answer": "C" },
+    { "question": "...", "choices": ["A","B","C","D"], "answer": "B" }
+  ]
 }
 
-export async function generateQuizQuestions(text) {
-  const OPEN_AI_KEY = await getKey();   // <-- same here
-  const prompt = `Make 3 multiple-choice questions based on:\n\n${text}`;
+Transcript:
+${text}
+`.trim();
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -42,10 +34,62 @@ export async function generateQuizQuestions(text) {
     },
     body: JSON.stringify({
       model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }]
+      temperature: 0.2,
+      messages: [
+        { role: 'system', content: 'Return only valid JSON. No commentary.' },
+        { role: 'user', content: prompt }
+      ]
     })
   });
 
-  const data = await response.json();
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`OpenAI error: ${res.status} ${t}`);
+  }
+
+  const data = await res.json();
+  const raw = data.choices?.[0]?.message?.content ?? '';
+
+  // robust JSON extraction (handles stray text)
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  const jsonText = start >= 0 && end > start ? raw.slice(start, end + 1) : raw;
+
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch {
+    throw new Error('Quiz JSON parse failed.');
+  }
+
+  const arr = Array.isArray(parsed?.questions) ? parsed.questions : [];
+  // normalize items
+  return arr.map(q => ({
+    question: String(q.question || '').trim(),
+    choices: Array.isArray(q.choices) ? q.choices.map(String) : [],
+    answer: String(q.answer || '').trim()
+  }));
+}
+
+export async function summarizeText(text) {
+  const OPEN_AI_KEY = await getKey();
+  const prompt = `Summarize into concise bullet points:\n\n${text}`;
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPEN_AI_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-3.5-turbo',
+      temperature: 0.3,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`OpenAI error: ${res.status} ${t}`);
+  }
+  const data = await res.json();
   return data.choices?.[0]?.message?.content || '';
 }

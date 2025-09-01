@@ -11,13 +11,11 @@
   color: #fff;
 }
 
-/* inner overlay (inside shadow) */
 .youtube-learning-overlay-root {
   all: initial;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
 
-  /* 🔑 stays tied to fixed-position host div */
   position: relative;
   inset: auto;
   bottom: auto;
@@ -26,21 +24,19 @@
   width: 350px;
   max-height: 500px;
 
-  /* 🔑 flex layout: fixed header + scrollable body */
   display: flex;
   flex-direction: column;
 
-  /* 🔑 clip inner scroll; body will handle overflow */
   overflow: hidden;
 
-  background: rgba(0, 0, 0, 0.4); /* Semi-transparent dark background */
+  background: rgba(0, 0, 0, 0.4); 
   backdrop-filter: blur(10px);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   padding: 20px;
   z-index: 2147483647;
 
-  cursor: default; /* drag cursor is applied on header */
+  cursor: default;
   pointer-events: auto;
 }
 
@@ -142,33 +138,28 @@ button:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* draggable header styling (drag handle) */
 .yt-overlay__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  /* keep header visible; it won't scroll */
   flex: 0 0 auto;
   margin-bottom: 10px;
 
   cursor: grab;
   user-select: none;
+  background-color: #caf0f8;
 }
 
 .yt-overlay__header:active {
   cursor: grabbing;
 }
 
-/* 🔑 make the BODY the scroll container */
 .main-overlay-content {
-  /* take remaining space in the flex column */
   flex: 1 1 auto;
 
-  /* critical for scroll inside flex children */
   min-height: 0;
 
-  /* actual scrolling happens here */
   overflow: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;

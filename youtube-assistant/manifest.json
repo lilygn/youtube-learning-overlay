@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Learning Overlay",
+  "version": "0.1.0",
+  "description": "Summarize and quiz YouTube videos with an overlay.",
+
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://m.youtube.com/*"
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["App.css"],
+      "matches": ["*://*/*"]
+    }
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*", "https://m.youtube.com/*"],
+      "js": ["assets/content.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "options_page": "options.html",
+  "permissions": ["storage"]
+}

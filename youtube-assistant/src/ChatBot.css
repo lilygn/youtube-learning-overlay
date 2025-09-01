@@ -1,5 +1,5 @@
 .chat-widget {
-    position: relative; /* Not fixed, flows in layout */
+    position: relative; 
     width: 100%;
     max-width: 360px;
     margin: 2rem auto 0 auto;
@@ -54,7 +54,7 @@
     border: none;
     background-color: #fff;
     color: #000;
-    z-index: 999999; /* <-- Semicolon fixed here */
+    z-index: 999999; 
     pointer-events: auto;
     position: relative;
   }
