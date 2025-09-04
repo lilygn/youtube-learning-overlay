@@ -1,1 +1,1 @@
-## Item is getting reviewed for chrome web store. 
+## Check the extension out: https://chromewebstore.google.com/detail/youtube-learning-overlay/jkmlllelhaoggehihgcefjhmdikiegne?pli=1
